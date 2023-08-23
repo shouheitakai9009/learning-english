@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Word {
+  id Int @id @default(autoincrement())
+  partOfSpeechId String
+  partOfSpeech PartOfSpeech @relation(fields: [partOfSpeechId], references: [id])
+  word String
+  mean String @db.Text
+  modelSentence String @db.Text
+  modelSentenceMean String @db.Text
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  deleted Boolean? @default(false)
+}
+
+model PartOfSpeech {
+  id String @id // 品詞英語
+  name String @unique // 品詞日本語
+  words Word[]
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  nickname String
+  registrationState RegistrationState @default(UNDONE)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  deleted Boolean? @default(false)
+}
+
+enum RegistrationState {
+  UNDONE
+  DONE
+}
