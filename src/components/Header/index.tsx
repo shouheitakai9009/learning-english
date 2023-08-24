@@ -7,28 +7,38 @@ import { LoginModal } from "@/features/Modal/LoginModal"
 import { useAuthLogin } from "@/services/mutations/Auth"
 import { ACCESS_TOKEN } from '@/constants/auth'
 import { useAuthProfile } from "@/services/queries/Users"
-import { useSetRecoilState } from "recoil"
+import { useRecoilState } from "recoil"
 import { atomAuthProfile } from "@/recoils/Global/atoms"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const Header = () => {
 
   const [isShowRegisterModal, setIsShowRegisterModal] = useState(false)
   const [isShowLoginModal, setIsShowLoginModal] = useState(false)
-
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined)
+  const [submittingLogin, setSubmittingLogin] = useState<boolean>(false)
+
+  const queryClient = useQueryClient()
   const loginMutation = useAuthLogin()
   const authProfileQuery = useAuthProfile(accessToken)
-  const setAuthProfile = useSetRecoilState(atomAuthProfile)
+  const [authProfile, setAuthProfile] = useRecoilState(atomAuthProfile)
 
   const onLogin = async (email: string, password: string) => {
+    setSubmittingLogin(true)
     loginMutation.mutate({ email, password })
+  }
+
+  const onLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN)
+    queryClient.invalidateQueries()
   }
 
   useEffect(() => {
     if (loginMutation.isSuccess && loginMutation.data) {
-      console.log(loginMutation.data.data.accessToken);
       window.localStorage.setItem(ACCESS_TOKEN, loginMutation.data.data.accessToken);
       setAccessToken(loginMutation.data.data.accessToken)
+      setSubmittingLogin(false)
+      setIsShowLoginModal(false)
     }
   }, [loginMutation.isSuccess])
 
@@ -36,7 +46,7 @@ export const Header = () => {
     if (authProfileQuery.isSuccess) {
       setAuthProfile(authProfileQuery.data ?? null)
     }
-  }, [authProfileQuery.isSuccess])
+  }, [authProfileQuery.isSuccess, authProfileQuery.isFetched, authProfileQuery.data])
 
   return (
     <header className="h-16 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
@@ -61,29 +71,45 @@ export const Header = () => {
               <Button className="absolute right-1 top-1 w-24">Search</Button>
             }
           />
-          <section>
-            <button
-              className="text-white text-lg font-bold hover:underline mr-6"
-              onClick={() => setIsShowRegisterModal(true)}
-            >
-              Sign up
-            </button>
-            <button
-              className="text-white text-lg font-bold hover:underline"
-              onClick={() => setIsShowLoginModal(true)}
-            >
-              Sign in
-            </button>
-          </section>
+          {
+            authProfile
+              ?
+              <section className="flex">
+                <span className="text-white">{authProfile.username} 様</span>
+                <button
+                  className="text-white text-md font-bold hover:underline cursor-pointer ml-8"
+                  onClick={onLogout}
+                >
+                  ログアウト
+                </button>
+              </section>
+              :
+              <section>
+                <button
+                  className="text-white text-md font-bold hover:underline mr-8 cursor-pointer"
+                  onClick={() => setIsShowRegisterModal(true)}
+                >
+                  登録
+                </button>
+                <button
+                  className="text-white text-md font-bold hover:underline cursor-pointer"
+                  onClick={() => setIsShowLoginModal(true)}
+                >
+                  ログイン
+                </button>
+              </section>
+          }
         </div>
       </div>
       <RegisterModal
         isOpen={isShowRegisterModal}
+        submitting={false}
         onClose={() => setIsShowRegisterModal(false)}
         onRegister={() => console.log('test')}
       />
       <LoginModal
         isOpen={isShowLoginModal}
+        submitting={submittingLogin}
         onClose={() => setIsShowLoginModal(false)}
         onLogin={onLogin}
       />

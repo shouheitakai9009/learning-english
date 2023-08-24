@@ -1,6 +1,9 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { WordsService } from './words.service';
-import { PartOfSpeech, Word } from '@prisma/client';
+import {
+  WordWithDefinitionAndPartOfSpeechType,
+  WordsService,
+} from './words.service';
+import { PartOfSpeech } from '@prisma/client';
 import { AuthGuard } from '../auth/auth.guard';
 
 export interface IFindWordRequestParams {
@@ -21,12 +24,12 @@ export class WordsController {
     japaneseWord?: IFindWordRequestParams['japaneseWord'],
     @Query('partOfSpeechIds')
     partOfSpeechIds?: IFindWordRequestParams['partOfSpeechIds'],
-  ): Promise<Word[]> {
+  ): Promise<WordWithDefinitionAndPartOfSpeechType[]> {
     return this.wordsService.findWords({
       where: {
         word: { contains: englishWord },
-        mean: { contains: japaneseWord },
         partOfSpeechId: { in: partOfSpeechIds },
+        definitions: { some: { definitionJp: { startsWith: japaneseWord } } },
       },
     });
   }

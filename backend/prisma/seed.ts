@@ -10,6 +10,7 @@ async function main() {
     { id: 'article', name: '冠詞' },
     { id: 'noun', name: '名詞' },
     { id: 'pronoun', name: '代名詞' },
+    { id: 'propernoun', name: '固有名詞' },
     { id: 'verb', name: '動詞' },
     { id: 'adjective', name: '形容詞' },
     { id: 'adverb', name: '副詞' },
@@ -17,6 +18,8 @@ async function main() {
     { id: 'conjunction', name: '接続詞' },
     { id: 'interjection', name: '間投詞' },
     { id: 'auxiliaryverb', name: '助動詞' },
+    { id: 'exclamation', name: '感嘆符' },
+    { id: 'numeral', name: '数値' },
     { id: 'unknown', name: '不明' },
   ];
   partOfSpeeches.forEach(async (partOfSpeech) => {

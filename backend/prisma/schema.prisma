@@ -15,12 +15,41 @@ model Word {
   partOfSpeechId String
   partOfSpeech PartOfSpeech @relation(fields: [partOfSpeechId], references: [id])
   word String
-  mean String @db.Text
-  modelSentence String @db.Text
-  modelSentenceMean String @db.Text
+  phonetic String @default("")
+  soundUrl String @default("")
+  origin String? @db.Text
+  originJp String? @db.Text
+  definitions Definition[]
+  synonyms Synonym[]
+  antonyms Antonym[]
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
   deleted Boolean? @default(false)
+}
+
+model Definition {
+  id Int @id @default(autoincrement())
+  wordId Int
+  word Word @relation(fields: [wordId], references: [id])
+  definition String @db.Text
+  definitionJp String @db.Text
+  example String? @db.Text
+  exampleJp String? @db.Text
+  isPrimary Boolean @default(false)
+}
+
+model Synonym {
+  id Int @id @default(autoincrement())
+  wordId Int
+  word Word @relation(fields: [wordId], references: [id])
+  synonym String
+}
+
+model Antonym {
+  id Int @id @default(autoincrement())
+  wordId Int
+  word Word @relation(fields: [wordId], references: [id])
+  antonym String
 }
 
 model PartOfSpeech {

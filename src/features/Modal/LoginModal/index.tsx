@@ -5,11 +5,12 @@ import { useState } from "react"
 
 interface Props {
   isOpen: boolean
+  submitting: boolean
   onClose: () => void
   onLogin: (email: string, password: string) => void
 }
 
-export const LoginModal = ({ isOpen, onClose, onLogin }: Props) => {
+export const LoginModal = ({ isOpen, submitting, onClose, onLogin }: Props) => {
 
   const [formEmail, setFormEmail] = useState<string>('')
   const [formPassword, setFormPassword] = useState<string>('')
@@ -17,15 +18,15 @@ export const LoginModal = ({ isOpen, onClose, onLogin }: Props) => {
   return (
     <Modal
       isOpen={isOpen}
-      headerText="Login with e-mail"
+      headerText="ログイン"
       footer={{
-        cancelButton: { text: 'Cancel', onClick: onClose},
-        submitButton: { text: 'Login', onClick: () => onLogin(formEmail, formPassword)}
+        cancelButton: { text: 'キャンセル', onClick: onClose},
+        submitButton: { text: 'ログインする', submitting, onClick: () => onLogin(formEmail, formPassword)}
       }}
       onClose={() => onClose()}
     >
       <div>
-        <FormLabel required>E-mail</FormLabel>
+        <FormLabel required>メールアドレス</FormLabel>
         <div>
           <TextField
             value={formEmail}
@@ -35,7 +36,7 @@ export const LoginModal = ({ isOpen, onClose, onLogin }: Props) => {
         </div>
       </div>
       <div className="mt-4">
-        <FormLabel required>Password</FormLabel>
+        <FormLabel required>パスワード</FormLabel>
         <div>
           <TextField
             type="password"

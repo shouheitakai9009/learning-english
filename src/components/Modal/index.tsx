@@ -3,13 +3,15 @@ import ReactModal from 'react-modal'
 import { Icon } from '../Icon'
 import { PropsWithChildren } from 'react'
 import { Button } from '../Button'
+import UseAnimations from 'react-useanimations';
+import loading from 'react-useanimations/lib/loading'
 
 interface Props extends PropsWithChildren {
   isOpen: boolean
   headerText?: string
   footer?: {
     cancelButton?: { text: string, onClick: () => void },
-    submitButton?: { text: string, onClick: () => void },
+    submitButton?: { text: string, submitting: boolean, onClick: () => void },
   }
   className?: string
   onClose: () => void
@@ -48,8 +50,12 @@ export const Modal = ({ isOpen, headerText, footer, className, onClose, children
               </Button>
             )}
             {footer.submitButton && (
-              <Button onClick={footer.submitButton.onClick}>
-                {footer.submitButton.text}
+              <Button type="submit" disabled={footer.submitButton.submitting} onClick={footer.submitButton.onClick}>
+                {
+                  footer.submitButton.submitting
+                    ? <UseAnimations animation={loading} strokeColor='white' />
+                    : footer.submitButton.text
+                }
               </Button>
             )}
           </section>

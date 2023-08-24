@@ -5,11 +5,12 @@ import { useState } from "react"
 
 interface Props {
   isOpen: boolean
+  submitting: boolean
   onClose: () => void
   onRegister: () => void
 }
 
-export const RegisterModal = ({ isOpen, onClose, onRegister }: Props) => {
+export const RegisterModal = ({ isOpen, submitting, onClose, onRegister }: Props) => {
 
   const [formNickname, setFormNickname] = useState<string>('')
   const [formEmail, setFormEmail] = useState<string>('')
@@ -18,15 +19,15 @@ export const RegisterModal = ({ isOpen, onClose, onRegister }: Props) => {
   return (
     <Modal
       isOpen={isOpen}
-      headerText="Register new member"
+      headerText="登録"
       footer={{
-        cancelButton: { text: 'Cancel', onClick: onClose},
-        submitButton: { text: 'Registration', onClick: onRegister}
+        cancelButton: { text: 'キャンセル', onClick: onClose},
+        submitButton: { text: '新規登録する', submitting, onClick: onRegister}
       }}
       onClose={() => onClose()}
     >
       <div>
-        <FormLabel required>E-mail</FormLabel>
+        <FormLabel required>メールアドレス</FormLabel>
         <div>
           <TextField
             value={formEmail}
@@ -36,7 +37,7 @@ export const RegisterModal = ({ isOpen, onClose, onRegister }: Props) => {
         </div>
       </div>
       <div className="mt-4">
-        <FormLabel required>Password</FormLabel>
+        <FormLabel required>パスワード</FormLabel>
         <div>
           <TextField
             type="password"
@@ -47,7 +48,7 @@ export const RegisterModal = ({ isOpen, onClose, onRegister }: Props) => {
         </div>
       </div>
       <div className="mt-4">
-        <FormLabel required>Nickname</FormLabel>
+        <FormLabel required>ニックネーム</FormLabel>
         <div>
           <TextField
             value={formNickname}
