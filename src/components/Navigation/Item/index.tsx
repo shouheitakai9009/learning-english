@@ -6,7 +6,7 @@ import classNames from "classnames"
 export type NavigationItemType = {
   label: string
   icon?: IconName
-  to: string
+  to?: string
 }
 
 interface Props extends NavigationItemType {
@@ -24,7 +24,7 @@ export const NavigationItem = ({
 
   return (
     <Link
-      to={to}
+      to={to ?? "#"}
       className={
         classNames('group w-full flex justify-between items-center rounded-lg', {
           'hover:bg-gradient-to-r hover:from-orange-400 hover:to-orange-500 hover:text-white': true,
@@ -58,7 +58,7 @@ export const NavigationItem = ({
       {size === 'sm' && (
         <Icon
           name="chevron-right"
-          className="[&_*]:group-hover:stroke-white [&_*]:w-4 [&_*]:h-4"
+          className="[&_*]:stroke-black [&_*]:group-hover:stroke-white [&_*]:w-4 [&_*]:h-4"
         />
       )}
     </Link>

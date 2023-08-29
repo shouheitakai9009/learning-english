@@ -1,0 +1,1 @@
+export type AnswerFormatType = 'english-to-japanese' | 'japanese-to-english'

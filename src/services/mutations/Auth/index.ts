@@ -1,6 +1,4 @@
-import { api } from "@/services/api"
-import { useMutation } from "@tanstack/react-query"
-import { AxiosResponse } from "axios"
+import { useMutationWrapper } from "../useMutationWrapper"
 
 interface ILoginParams {
   email: string
@@ -12,9 +10,7 @@ interface ILoginResponse {
 }
 
 export const useAuthLogin = () => {
-  const mutation = useMutation<AxiosResponse<ILoginResponse>, unknown, ILoginParams>({
-    mutationFn: params => api.post<ILoginResponse>("/auth/login", params)
-  })
+  const mutation = useMutationWrapper<ILoginResponse, unknown, ILoginParams>({ url: "/auth/login" })
 
   return mutation
 }

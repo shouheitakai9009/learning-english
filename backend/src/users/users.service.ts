@@ -16,4 +16,19 @@ export class UsersService {
       where: { id },
     });
   }
+
+  async create(email: string, password: string, nickname: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      const newUser = await this.prisma.user.create({
+        data: {
+          email,
+          password,
+          nickname,
+        },
+      });
+      return newUser;
+    }
+    return null;
+  }
 }

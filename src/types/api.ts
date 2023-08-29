@@ -1,3 +1,5 @@
 export type * from '../../backend/node_modules/@prisma/client'
 export type * from '../../backend/src/words/words.controller'
+export type * from '../../backend/src/random-flash-history/random-flash-history.controller'
 export type * from '../../backend/src/words/words.service'
+export type * from '../../backend/src/prisma.service'

@@ -1,10 +1,8 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import {
-  WordWithDefinitionAndPartOfSpeechType,
-  WordsService,
-} from './words.service';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { WordWithRandomFlash, WordsService } from './words.service';
 import { PartOfSpeech } from '@prisma/client';
-import { AuthGuard } from '../auth/auth.guard';
+import { Public } from '../factory/public';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 export interface IFindWordRequestParams {
   japaneseWord?: string;
@@ -16,20 +14,54 @@ export interface IFindWordRequestParams {
 export class WordsController {
   constructor(private wordsService: WordsService) {}
 
-  @UseGuards(AuthGuard)
-  @Get()
-  public async find(
+  @Public()
+  @Get('search')
+  public async search(
     @Query('englishWord') englishWord?: IFindWordRequestParams['englishWord'],
     @Query('japaneseWord')
     japaneseWord?: IFindWordRequestParams['japaneseWord'],
     @Query('partOfSpeechIds')
     partOfSpeechIds?: IFindWordRequestParams['partOfSpeechIds'],
-  ): Promise<WordWithDefinitionAndPartOfSpeechType[]> {
+  ): Promise<WordWithRandomFlash[]> {
     return this.wordsService.findWords({
       where: {
         word: { contains: englishWord },
         partOfSpeechId: { in: partOfSpeechIds },
         definitions: { some: { definitionJp: { startsWith: japaneseWord } } },
+      },
+    });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('random-flash')
+  public async randomFlash(@Req() req): Promise<WordWithRandomFlash[]> {
+    return this.wordsService.findWords({
+      take: 10,
+      where: {
+        OR: [
+          {
+            randomFlashHistories: {
+              none: {
+                id: undefined,
+              },
+            },
+          },
+          {
+            randomFlashHistories: {
+              some: {
+                success: false,
+                userId: req.user.sub,
+              },
+            },
+          },
+        ],
+        AND: [
+          {
+            definitions: {
+              some: {},
+            },
+          },
+        ],
       },
     });
   }

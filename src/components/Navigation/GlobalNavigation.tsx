@@ -10,9 +10,12 @@ const navigations: NavigationStateType[] = [
   {
     label: "Home", icon: "home", to: "/",
   },
-  {
-    label: "Flash card", icon: "banknotes", to: "/flashcard",
-  },
+  { label: "Practice", icon: "banknotes", children: [
+    { label: "Understand", to: "/practice/understand" }
+  ]},
+  { label: "Flash card", icon: "banknotes", children: [
+    { label: 'Random Flash', to: '/flashcard/randomflash' },
+  ]},
   { label: "All words", icon: "book-open", to: "/words" },
   { label: "Fill sentence", icon: "clipboard-document-list", to: "/sentence" },
   { label: "Active recall", icon: "arrow-path", to: "/activerecall" },
@@ -35,7 +38,7 @@ export const GlobalNavigation = () => {
         {navigations.map(navigation => (
           <li key={navigation.label}>
             <NavigationItem
-              selected={isSelected(navigation.to)}
+              selected={isSelected(navigation.to ?? '#')}
               {...navigation}
             />
             {navigation.children && navigation.children.length > 0 && (
@@ -43,7 +46,7 @@ export const GlobalNavigation = () => {
                 {navigation.children.map(child => (
                   <li key={child.label}>
                     <NavigationItem
-                      selected={isSelected(child.to)}
+                      selected={isSelected(child.to ?? '#')}
                       size="sm"
                       {...child}
                     />

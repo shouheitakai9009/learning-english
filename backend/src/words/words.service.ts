@@ -1,23 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { Definition, PartOfSpeech, Prisma, Word } from '@prisma/client';
+import { PrismaArgsType, PrismaService } from '../prisma.service';
+import {
+  Definition,
+  PartOfSpeech,
+  RandomFlashHistory,
+  Synonym,
+  Word,
+} from '@prisma/client';
 
-export type WordWithDefinitionAndPartOfSpeechType = Word & {
+export type WordWithRandomFlash = Word & {
   definitions: Definition[];
   partOfSpeech: PartOfSpeech;
+  synonyms: Synonym[];
+  randomFlashHistories: RandomFlashHistory[];
 };
 
 @Injectable()
 export class WordsService {
   constructor(private prisma: PrismaService) {}
 
-  async findWords(params: {
-    where: Prisma.WordWhereInput;
-  }): Promise<WordWithDefinitionAndPartOfSpeechType[]> {
+  async findWords(args: PrismaArgsType): Promise<WordWithRandomFlash[]> {
     return await this.prisma.word.findMany({
-      where: params.where,
       take: 100,
-      include: { partOfSpeech: true, definitions: true },
+      include: {
+        partOfSpeech: true,
+        definitions: true,
+        synonyms: true,
+        randomFlashHistories: true,
+      },
+      ...args,
     });
   }
 }

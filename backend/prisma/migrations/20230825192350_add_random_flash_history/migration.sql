@@ -1,0 +1,20 @@
+-- CreateTable
+CREATE TABLE `RandomFlashHistory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `wordId` INTEGER NOT NULL,
+    `answerFormat` ENUM('ENGLISH_TO_JAPANESE', 'JAPANESE_TO_ENGLISH') NOT NULL DEFAULT 'ENGLISH_TO_JAPANESE',
+    `success` BOOLEAN NOT NULL,
+    `text` TEXT NULL,
+    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `deleted` BOOLEAN NULL DEFAULT false,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `RandomFlashHistory` ADD CONSTRAINT `RandomFlashHistory_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `RandomFlashHistory` ADD CONSTRAINT `RandomFlashHistory_wordId_fkey` FOREIGN KEY (`wordId`) REFERENCES `Word`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

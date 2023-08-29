@@ -5,48 +5,29 @@
 ## Purpose
 覚えた英単語を話すことができ、聞くことができ、理解できる。
 
-## Solution
-- 一言で言うと、`英語学習GPT`
-- マイストレージには、学ぶべき英単語がバッファされていく
-- スペースドリピテーション的にそれらを消化することにポイントが貯まる
-- どのように英単語を貯めるか？
-  - 英語記事のURLを貼って、まずは読む、わからない単語をチェックして、バッファしていく
-  - レベルに応じた単語課題を出し、間違えたものをバッファ
-  - 穴埋め問題、間違えたらバッファ
-- マイストレージで穴埋めまたはクイズ、わからないところを先生に聞ける
+## Features
 
-## Technical
-どのように実装するか？データ構造、画面設計など。
-- データ構造
-  - words
-    - id: number autoincrement primary
-    - english_word: string unique
-    - japanese_word: string not null
-    - level: beginner, intermediate, advanced, not professional null
-    - sentence: string not null
-    - part_of_speech: noun | pronoun | verb | adjective | adverb | preposition | conjection | interjection
-  - last_answers
-    - id
-    - word_id
-    - count
-    - answer_format: quiz | sentence
-    - result: 0 | 1
-    - answer_date
-  - completed_words
-    - id
-    - word_id
+### Random flash
+10題で1セットのフラッシュカードを連続でクリアしていく
+間違えた単語は次回セットでも出題され、新規単語が加わった10題をクリアしていく...これを繰り返し1日30-50語は完璧に覚えよう！
 
+#### 出題形式
+- `english-to-japanese` 日本語訳を回答する
+- `japanese-to-english` 英語訳を回答する
+- `part-of-speech` 品詞を回答する
 
-## Learning details
-- エラーレスラーニング（Errorless Learning）
-  - 初めての単語練習で扱う学習方法です。ユーザが間違える前に正解を教えることで間違えた情報を記憶するリスクを防ぐ方法です。
-- アクティブリコール（Active Recall）
-  - 学習済みの英単語を、英文章として穴埋め部分に出題したり、クイズ形式にしたり、記憶の定着化を目指す学習方法です。
-- スペースドリピテーション（Spaced Repetition）
-  - いわゆる繰り返し学習で、同じ単語に何回も出会うことを目的としています。
-- インターリービング学習（Interleaved Learning）
-  - 似たような単語ではなく、ランダムな順序で別カテゴリの英単語を学ぶための学習方法です。
-
-## Values
-- Gamification
-- Modern UI
+#### 回答画面のUI
+- 今まで覚えた単語数
+- 今日覚えた単語数
+- 今日間違えた単語数
+- nセット目
+- ヘッダー
+  - 出題形式の説明テキスト
+- 英単語フィールド
+  - 英単語
+  - 音声アイコン
+  - 英単語発音記号
+- 回答フィールド
+  - `english-to-japanese` ならテキストフィールド
+  - `japanese-to-english ならテキストフィールド
+  - `part-of-speech` ならタグ一覧

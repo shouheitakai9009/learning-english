@@ -1,24 +1,13 @@
-import pandas as pd
 import mysql.connector
 import datetime
 import requests
 import deepl_utils
 
-df = pd.read_excel("./words_list.xlsx", sheet_name='V(修正１ 冊子)')
-
-# 品詞の日本語表記から英語表記へのマッピング
-part_of_speech_mapping = {
-  '冠': 'article',
-  '名': 'noun',
-  '代': 'pronoun',
-  '動': 'verb',
-  '形': 'adjective',
-  '副': 'adverb',
-  '前': 'preposition',
-  '接': 'conjunction',
-  '間': 'interjection',
-  '助': 'auxiliaryverb',
-}
+f = open("./words_list.txt", "r")
+words_txt = f.read()
+words_list = words_txt.split(",")
+print(len(words_list))
+f.close()
 
 connection = mysql.connector.connect(
   user='root',
@@ -26,8 +15,8 @@ connection = mysql.connector.connect(
 )
 cursor = connection.cursor(buffered=True)
 insert_word_query = '''
-INSERT INTO `Word` (`word`,`partOfSpeechId`,`phonetic`,`soundUrl`,`origin`, `originJp`, `createdAt`,`updatedAt`, `deleted`)
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+INSERT INTO `Word` (`word`, `meaning`, `partOfSpeechId`,`phonetic`,`soundUrl`, `createdAt`,`updatedAt`, `deleted`)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
 '''
 
 insert_definition_query = '''
@@ -54,27 +43,25 @@ SELECT `id` FROM `Definition` WHERE `definition` = %s OR `example` = %s
 delete_antonym_query = 'DELETE FROM `Antonym`'
 delete_synonym_query = 'DELETE FROM `Synonym`'
 delete_definition_query = 'DELETE FROM `Definition`'
+delete_randomflashhistory_query = 'DELETE FROM `randomflashhistory`'
 delete_word_query = 'DELETE FROM `Word`'
-cursor.execute(delete_definition_query)
-cursor.execute(delete_synonym_query)
-cursor.execute(delete_antonym_query)
-cursor.execute(delete_word_query)
-print('Completed deleting all data ----')
+# cursor.execute(delete_randomflashhistory_query)
+# cursor.execute(delete_definition_query)
+# cursor.execute(delete_synonym_query)
+# cursor.execute(delete_antonym_query)
+# cursor.execute(delete_word_query)
+# print('Completed deleting all data ----')
 
 # ------- Loop Start --------
-master_words = []
-for index, row in df.iloc[1201:1210].iterrows(): master_words.append(row["単語"])
-
 try:
-  for index, master_word in enumerate(master_words):
+  for index, master_word in enumerate(words_list[2001:4000]):
     response = requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{master_word}')
     for word in list(response.json()):
       if type(word) is not dict: continue
-      dWord, dPhonetic, dOrigin, dOriginJp, dAudioUrl, dPartOfSpeech = (
+      dWord, dMeaning, dPhonetic, dAudioUrl, dPartOfSpeech = (
         word.get('word'),
+        deepl_utils.translate(word.get('word')),
         word.get('phonetic'),
-        word.get('origin') if 'origin' in word else "",
-        deepl_utils.translate(word.get('origin')) if 'origin' in word else "",
         '',
         '',
       )
@@ -91,7 +78,6 @@ try:
           dPartOfSpeech = meaning.get('partOfSpeech').replace(' ', '')
           # Note: 既にWordに存在する場合はそのID、なければNoneが入るぞ
           cursor.execute(select_word_query, (dWord, dPartOfSpeech))
-          print(cursor.fetchone())
           if cursor.fetchone() != None and existWordId == None: existWordId = cursor.fetchone()
           # --------- Definitions
           for i, definition in enumerate(meaning.get('definitions')):
@@ -112,17 +98,15 @@ try:
           dAntonyms = meaning.get('antonyms')
 
       # -------- Insert Word Table
-      if dPhonetic == None: continue
+      if dPhonetic == None or dAudioUrl == None: continue
       lastrowid = None
-      print('最終的なやつ',existWordId)
       if existWordId == None:
         cursor.execute(insert_word_query, (
           dWord,
+          dMeaning,
           dPartOfSpeech.replace(' ', ''),
           dPhonetic,
           dAudioUrl,
-          dOrigin,
-          dOriginJp,
           datetime.datetime.now(),
           datetime.datetime.now(),
           0

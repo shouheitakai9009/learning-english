@@ -1,5 +1,5 @@
 import { usePartOfSpeech } from "@/services/queries/PartOfSpeeches"
-import { useWords } from "@/services/queries/Words"
+import { useSearchWords } from "@/services/queries/Words/useSearchWords"
 import { PartOfSpeech } from "@/types/api"
 import { useCallback, useMemo, useState } from "react"
 
@@ -9,7 +9,7 @@ export const useSearchCondition = () => {
   const [searchJapaneseWord, setSearchJapaneseWord] = useState<string>('')
   const [searchEnglishWord, setSearchEnglishWord] = useState<string>('')
 
-  const queryWords = useWords({
+  const queryWords = useSearchWords({
     japaneseWord: searchJapaneseWord,
     englishWord: searchEnglishWord,
     partOfSpeechIds: searchPartOfSpeechIds,

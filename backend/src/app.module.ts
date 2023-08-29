@@ -10,6 +10,8 @@ import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { RandomFlashHistoryController } from './random-flash-history/random-flash-history.controller';
+import { RandomFlashHistoryService } from './random-flash-history/random-flash-history.service';
 
 @Module({
   imports: [UsersModule, AuthModule],
@@ -18,8 +20,15 @@ import { AuthModule } from './auth/auth.module';
     WordsController,
     PartOfSpeechesController,
     UsersController,
+    RandomFlashHistoryController,
   ],
-  providers: [AppService, WordsService, PrismaService, UsersService],
+  providers: [
+    AppService,
+    WordsService,
+    PrismaService,
+    UsersService,
+    RandomFlashHistoryService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

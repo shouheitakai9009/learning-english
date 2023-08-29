@@ -10,14 +10,15 @@ interface Props extends PropsWithChildren {
   isOpen: boolean
   headerText?: string
   footer?: {
-    cancelButton?: { text: string, onClick: () => void },
-    submitButton?: { text: string, submitting: boolean, onClick: () => void },
+    cancelButton?: { text: string },
+    submitButton?: { text: string, submitting: boolean },
   }
   className?: string
   onClose: () => void
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
-export const Modal = ({ isOpen, headerText, footer, className, onClose, children }: Props) => {
+export const Modal = ({ isOpen, headerText, footer, className, onClose, onSubmit, children }: Props) => {
   return (
     <ReactModal
       isOpen={isOpen}
@@ -26,7 +27,7 @@ export const Modal = ({ isOpen, headerText, footer, className, onClose, children
       className={classNames("rounded-lg bg-white absolute top-1/2 left-1/2 right-auto bottom-auto mr-[-50%] translate-x-[-50%] translate-y-[-50%]", className)}
       onRequestClose={onClose}
     >
-      <div>
+      <form onReset={onClose} onSubmit={onSubmit}>
         <section className="flex justify-between items-center border-b border-gray-200 px-6 h-14">
           <p className="font-bold text-xl">{headerText}</p>
           <Icon
@@ -44,13 +45,13 @@ export const Modal = ({ isOpen, headerText, footer, className, onClose, children
               <Button
                 outline
                 className='mr-2'
-                onClick={footer.cancelButton.onClick}
+                onClick={onClose}
               >
                 {footer.cancelButton.text}
               </Button>
             )}
             {footer.submitButton && (
-              <Button type="submit" disabled={footer.submitButton.submitting} onClick={footer.submitButton.onClick}>
+              <Button type="submit" disabled={footer.submitButton.submitting}>
                 {
                   footer.submitButton.submitting
                     ? <UseAnimations animation={loading} strokeColor='white' />
@@ -60,7 +61,7 @@ export const Modal = ({ isOpen, headerText, footer, className, onClose, children
             )}
           </section>
         )}
-      </div>
+      </form>
     </ReactModal>
   )
 }

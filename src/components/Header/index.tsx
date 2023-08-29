@@ -1,52 +1,24 @@
 import { Link } from "react-router-dom"
 import { TextField } from "../TextField"
-import { useEffect, useState } from "react"
 import { Button } from "../Button"
 import { RegisterModal } from "@/features/Modal/RegisterModal"
 import { LoginModal } from "@/features/Modal/LoginModal"
-import { useAuthLogin } from "@/services/mutations/Auth"
-import { ACCESS_TOKEN } from '@/constants/auth'
-import { useAuthProfile } from "@/services/queries/Users"
-import { useRecoilState } from "recoil"
-import { atomAuthProfile } from "@/recoils/Global/atoms"
-import { useQueryClient } from "@tanstack/react-query"
+import { useSign } from "./useSign"
 
 export const Header = () => {
 
-  const [isShowRegisterModal, setIsShowRegisterModal] = useState(false)
-  const [isShowLoginModal, setIsShowLoginModal] = useState(false)
-  const [accessToken, setAccessToken] = useState<string | undefined>(undefined)
-  const [submittingLogin, setSubmittingLogin] = useState<boolean>(false)
-
-  const queryClient = useQueryClient()
-  const loginMutation = useAuthLogin()
-  const authProfileQuery = useAuthProfile(accessToken)
-  const [authProfile, setAuthProfile] = useRecoilState(atomAuthProfile)
-
-  const onLogin = async (email: string, password: string) => {
-    setSubmittingLogin(true)
-    loginMutation.mutate({ email, password })
-  }
-
-  const onLogout = () => {
-    localStorage.removeItem(ACCESS_TOKEN)
-    queryClient.invalidateQueries()
-  }
-
-  useEffect(() => {
-    if (loginMutation.isSuccess && loginMutation.data) {
-      window.localStorage.setItem(ACCESS_TOKEN, loginMutation.data.data.accessToken);
-      setAccessToken(loginMutation.data.data.accessToken)
-      setSubmittingLogin(false)
-      setIsShowLoginModal(false)
-    }
-  }, [loginMutation.isSuccess])
-
-  useEffect(() => {
-    if (authProfileQuery.isSuccess) {
-      setAuthProfile(authProfileQuery.data ?? null)
-    }
-  }, [authProfileQuery.isSuccess, authProfileQuery.isFetched, authProfileQuery.data])
+  const {
+    user,
+    isShowLoginModal,
+    isShowRegisterModal,
+    submitting,
+    authProfile,
+    setIsShowRegisterModal,
+    setIsShowLoginModal,
+    onLogout,
+    onLogin,
+    onRegister,
+  } = useSign()
 
   return (
     <header className="h-16 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
@@ -72,10 +44,10 @@ export const Header = () => {
             }
           />
           {
-            authProfile
+            authProfile && user
               ?
               <section className="flex">
-                <span className="text-white">{authProfile.username} 様</span>
+                <span className="text-white">{user.nickname} 様</span>
                 <button
                   className="text-white text-md font-bold hover:underline cursor-pointer ml-8"
                   onClick={onLogout}
@@ -103,13 +75,13 @@ export const Header = () => {
       </div>
       <RegisterModal
         isOpen={isShowRegisterModal}
-        submitting={false}
+        submitting={submitting}
         onClose={() => setIsShowRegisterModal(false)}
-        onRegister={() => console.log('test')}
+        onRegister={onRegister}
       />
       <LoginModal
         isOpen={isShowLoginModal}
-        submitting={submittingLogin}
+        submitting={submitting}
         onClose={() => setIsShowLoginModal(false)}
         onLogin={onLogin}
       />

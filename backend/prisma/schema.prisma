@@ -10,21 +10,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model RandomFlashHistory {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  wordId Int
+  word Word @relation(fields: [wordId], references: [id])
+  answerFormat AnswerFormat @default(ENGLISH_TO_JAPANESE)
+  success Boolean
+  text String? @db.Text
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  deleted Boolean? @default(false)
+}
+
 model Word {
   id Int @id @default(autoincrement())
   partOfSpeechId String
   partOfSpeech PartOfSpeech @relation(fields: [partOfSpeechId], references: [id])
   word String
+  meaning String
   phonetic String @default("")
   soundUrl String @default("")
-  origin String? @db.Text
-  originJp String? @db.Text
   definitions Definition[]
   synonyms Synonym[]
   antonyms Antonym[]
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
   deleted Boolean? @default(false)
+  randomFlashHistories RandomFlashHistory[]
 }
 
 model Definition {
@@ -67,9 +81,15 @@ model User {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
   deleted Boolean? @default(false)
+  randomFlashHistories RandomFlashHistory[]
 }
 
 enum RegistrationState {
   UNDONE
   DONE
+}
+
+enum AnswerFormat {
+  ENGLISH_TO_JAPANESE
+  JAPANESE_TO_ENGLISH
 }

@@ -1,10 +1,11 @@
 import { useQueryWrapper } from "@/services/queries/useQueryWrapper"
 import { User } from "@/types/api"
 
-export const useUser = () => {
+export const useUser = (enabled: boolean) => {
   const response = useQueryWrapper<User>(
     ['users'],
-    { url: 'users/get' }
+    { url: 'users/get' },
+    { enabled }
   )
 
   return response

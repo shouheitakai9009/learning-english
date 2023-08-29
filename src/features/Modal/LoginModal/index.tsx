@@ -1,7 +1,9 @@
+import { ErrorMessage } from "@/components/ErrorMessage"
 import { FormLabel } from "@/components/FormLabel"
 import { Modal } from "@/components/Modal"
 import { TextField } from "@/components/TextField"
-import { useState } from "react"
+import { useFormik } from "formik"
+import * as Yup from 'yup'
 
 interface Props {
   isOpen: boolean
@@ -10,40 +12,57 @@ interface Props {
   onLogin: (email: string, password: string) => void
 }
 
+const LoginScheema = Yup.object().shape({
+  email: Yup.string().required("入力必須です"),
+  password: Yup.string().required("入力必須です").min(8, "最低8文字以上入力してください"),
+})
+
 export const LoginModal = ({ isOpen, submitting, onClose, onLogin }: Props) => {
 
-  const [formEmail, setFormEmail] = useState<string>('')
-  const [formPassword, setFormPassword] = useState<string>('')
+  const formik = useFormik({
+    initialValues: { email: "nana7.yu@gmail.com", password: "Asilasil2" },
+    validationSchema: LoginScheema,
+    onSubmit: values => {
+      if (values.email && values.password) {
+        onLogin(values.email, values.password)
+      }
+    }
+  })
 
   return (
     <Modal
       isOpen={isOpen}
       headerText="ログイン"
       footer={{
-        cancelButton: { text: 'キャンセル', onClick: onClose},
-        submitButton: { text: 'ログインする', submitting, onClick: () => onLogin(formEmail, formPassword)}
+        cancelButton: { text: 'キャンセル'},
+        submitButton: { text: 'ログインする', submitting }
       }}
       onClose={() => onClose()}
+      onSubmit={formik.handleSubmit}
     >
       <div>
-        <FormLabel required>メールアドレス</FormLabel>
         <div>
+          <FormLabel required htmlFor="email">メールアドレス</FormLabel>
           <TextField
-            value={formEmail}
+            id="email"
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
             className="h-10 px-4 rounded-md w-96 border border-slate-300"
-            onChange={e => setFormEmail(e.target.value)}
           />
+          <ErrorMessage text={formik.errors.email} />
         </div>
-      </div>
-      <div className="mt-4">
-        <FormLabel required>パスワード</FormLabel>
-        <div>
+        <div className="mt-4">
+          <FormLabel required htmlFor="password">パスワード</FormLabel>
           <TextField
+            id="password"
+            name="password"
             type="password"
-            value={formPassword}
+            value={formik.values.password}
+            onChange={formik.handleChange}
             className="h-10 px-4 rounded-md w-96 border border-slate-300"
-            onChange={e => setFormPassword(e.target.value)}
           />
+          <ErrorMessage text={formik.errors.password} />
         </div>
       </div>
     </Modal>

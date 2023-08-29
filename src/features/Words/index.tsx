@@ -3,9 +3,7 @@ import { TBody, TDataCell, TDataRow, THead, Table, Th } from "@/components/Table
 import { Tag } from "@/components/Tag"
 import { TextField } from "@/components/TextField"
 import { useSearchCondition } from "./useSearchCondition"
-import { Icon } from "@/components/Icon"
-import { Word } from "@/types/api"
-import test from '@/assets/materials/background.png'
+import { WordSummary } from "@/components/Word/summary"
 
 export const Words = () => {
 
@@ -20,11 +18,6 @@ export const Words = () => {
     setSearchEnglishWord,
     setSearchJapaneseWord
   } = useSearchCondition()
-
-  const onPlayWord = (word: Word) => {
-    const audio = new Audio(word.soundUrl)
-    audio.play()
-  }
 
   return (
     <>
@@ -80,31 +73,39 @@ export const Words = () => {
           <THead className="sticky">
             <Th className="w-20 min-w-[80px] rounded-tl-md pl-4">ID</Th>
             <Th className="w-48 min-w-[190px]">Word</Th>
+            <Th className="rounded-tr-md min-w-[130px]">Meaning</Th>
             <Th className="rounded-tr-md">Definition</Th>
+            <Th className="rounded-tr-md">Example</Th>
           </THead>
           <TBody>
             {queryWords.isSuccess && queryWords.data.map(word => (
               <TDataRow key={word.id}>
                 <TDataCell className="pl-4">{word.id}</TDataCell>
-                <TDataCell className="!text-lg py-1">
-                  <div className="flex items-center">
-                    {word.word}
-                    {word.soundUrl && (
-                      <Icon name="musical-note"
-                        className="[&_*]:w-5 [&_*]:h-5 ml-2 [&_*]:stroke-pink-500"
-                        onClick={() => onPlayWord(word)}
-                      />
-                    )}
-                  </div>
-                  <span className="text-gray-500 text-sm">{word.phonetic}</span>
+                <TDataCell className="py-4">
+                  <WordSummary word={word} />
+                </TDataCell>
+                <TDataCell>
+                  {word.meaning}
                 </TDataCell>
                 <TDataCell className="py-1">
-                  {word.definitions.map(definition => (
-                    <div className="flex mb-1">
-                      <span className="text-sm border border-black w-5 h-5 flex items-center justify-center mr-1">{word.partOfSpeech.name.substring(0,1)}</span>
-                      <span className="text-sm">{definition.definitionJp}</span>
-                    </div>
-                  ))}
+                  {word.definitions.map((definition, index) => {
+                    if (index >= 2) return null
+                    return (
+                      <div className="flex mb-1">
+                        <span className="text-sm leading-relaxed">{definition.definitionJp}</span>
+                      </div>
+                    )
+                  })}
+                </TDataCell>
+                <TDataCell className="py-1">
+                  {word.definitions.map((definition, index) => {
+                    if (index >= 2) return null
+                    return (
+                      <div className="flex mb-1">
+                        <span className="text-sm leading-relaxed">{definition.example}</span>
+                      </div>
+                    )
+                  })}
                 </TDataCell>
               </TDataRow>
             ))}
